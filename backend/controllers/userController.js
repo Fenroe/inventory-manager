@@ -1,5 +1,10 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+};
 
 const registerUser = async (req, res, next) => {
   try {
@@ -27,6 +32,17 @@ const registerUser = async (req, res, next) => {
     });
     if (user) {
       const { _id, name, email, photo, phone, bio } = user;
+      // generate token
+      const token = generateToken(_id);
+      // send HTTP-only cookie
+      res.cookie("token", token, {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 86400), // 1 day
+        sameSite: "none",
+        secure: true,
+      });
+      // send response
       res.status(201).json({
         _id,
         name,
