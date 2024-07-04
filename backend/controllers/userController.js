@@ -60,6 +60,15 @@ const registerUser = async (req, res, next) => {
   }
 };
 
+const loginUser = async (req, res, next) => {
+  try {
+    res.send("Login user");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
+  loginUser,
 };
