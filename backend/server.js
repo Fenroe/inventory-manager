@@ -1,4 +1,4 @@
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -6,6 +6,9 @@ const cors = require("cors");
 const userRoute = require("./routes/userRoute");
 const errorHandler = require("./middleware/errorHandler");
 const cookieParser = require("cookie-parser");
+
+// load env variables
+dotenv.config();
 
 const app = express();
 

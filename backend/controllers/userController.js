@@ -62,7 +62,44 @@ const registerUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   try {
-    res.send("Login user");
+    const { email, password } = req.body;
+    // validate request
+    if (!email || !password) {
+      res.status(400);
+      throw new Error("Please fill in all required fields");
+    }
+    // check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("Incorrect username or password");
+    }
+    // check if password correct
+    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+    // throw error if password is not correct
+    if (!passwordIsCorrect) {
+      throw new Error("Incorrect username or password");
+    } else {
+      const { _id, name, email, photo, phone, bio } = user;
+      // generate token
+      const token = generateToken(_id);
+      // send HTTP-only cookie
+      res.cookie("token", token, {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 86400), // 1 day
+        sameSite: "none",
+        secure: true,
+      });
+      // send response
+      res.status(201).json({
+        _id,
+        name,
+        email,
+        photo,
+        phone,
+        bio,
+      });
+    }
   } catch (error) {
     next(error);
   }
